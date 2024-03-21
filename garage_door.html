@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Garage Door Status</title>
+  <style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+  }
+  button {
+    background-color: lightgray;
+    cursor: pointer;
+    padding: 15px 20px;
+    font-size: 16px;
+  }
+  </style>
+  <script>
+  var refresh;
+  function updateStatus() { 
+    fetch('/status') 
+    .then(response => response.json())
+    .then(msg => {
+      document.getElementById('status').textContent = msg.door_state;
+      if (msg.door_state == 'OPEN') { 
+        document.getElementById('closed-path').style.display = 'none';
+      } else { 
+        document.getElementById('closed-path').style.display = 'block';
+      }
+    })
+    .catch(error => { 
+      document.getElementById('status').textContent = 'Status Error';
+    });
+  }
+  function activateDoor() { 
+    clearInterval(refresh);
+    fetch('/activate', { method: 'POST' }) 
+    .then(response => response.json()) 
+    .then(msg => { 
+      document.getElementById('status').textContent = msg.door_state; 
+    }) 
+    .catch(error => { 
+      document.getElementById('status').textContent = 'Activate Error'; 
+    }); 
+    refresh = setInterval(updateStatus, 15000);
+  }; 
+  updateStatus(); 
+  refresh = setInterval(updateStatus, 15000); 
+  </script>
+</head>
+<body>
+  <h1>Garage Door Status</h1>
+  <div id="status-container">
+    <svg id="garage-door" style="width: 200px;" role="img" viewBox="0 0 24 24">
+      <g>
+        <path id="closed-path" style="display:block;" class="primary-path" d="M22 9V20H20V11H4V20H2V9L12 5L22 9M19 12H5V14H19V12M19 18H5V20H19V18M19 15H5V17H19V15Z"></path>
+        <path id="open-path" style="display:block;" class="primary-path" d="M22 9V20H20V11H4V20H2V9L12 5L22 9M19 12H5V14H19V12Z"></path>
+      </g>
+    </svg>
+    <p id="status" style="font-size: 16px;margin: 20px 10px;">CLOSED</p>
+    <button id="activate-btn" onclick="activateDoor();" style="width: 200px;">Activate Door</button>
+  </div>
+</body>
+</html>
