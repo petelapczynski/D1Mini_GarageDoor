@@ -16,7 +16,8 @@
   }
   </style>
   <script>
-  var refresh;
+  var refreshFunction;
+  var refreshInterval = 15000; // 15 sec
   function updateStatus() { 
     fetch('/status') 
     .then(response => response.json())
@@ -33,7 +34,7 @@
     });
   }
   function activateDoor() { 
-    clearInterval(refresh);
+    clearInterval(refreshFunction);
     fetch('/activate', { method: 'POST' }) 
     .then(response => response.json()) 
     .then(msg => { 
@@ -42,10 +43,10 @@
     .catch(error => { 
       document.getElementById('status').textContent = 'Activate Error'; 
     }); 
-    refresh = setInterval(updateStatus, 15000);
+    refreshFunction = setInterval(updateStatus, refreshInterval);
   }; 
   updateStatus(); 
-  refresh = setInterval(updateStatus, 15000); 
+  refreshFunction = setInterval(updateStatus, refreshInterval); 
   </script>
 </head>
 <body>
