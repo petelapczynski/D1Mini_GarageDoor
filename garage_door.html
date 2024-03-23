@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Garage Door Status</title>
-  <style>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Garage Door Status</title>
+<style>
   body {
     font-family: Arial, sans-serif;
     text-align: center;
@@ -14,47 +14,51 @@
     padding: 15px 20px;
     font-size: 16px;
   }
-  </style>
-  <script>
-  var refreshFunction;
-  var refreshInterval = 15000; // 15 sec
-  function updateStatus() { 
-    fetch('/status') 
-    .then(response => response.json())
-    .then(msg => {
-      document.getElementById('status').textContent = msg.door_state;
-      if (msg.door_state == 'OPEN') { 
-        document.getElementById('closed-path').style.display = 'none';
-      } else { 
-        document.getElementById('closed-path').style.display = 'block';
-      }
-    })
-    .catch(error => { 
-      document.getElementById('status').textContent = 'Status Error';
-    });
-  }
-  function activateDoor() { 
-    clearInterval(refreshFunction);
-    fetch('/activate', { method: 'POST' }) 
-    .then(response => response.json()) 
-    .then(msg => { 
-      document.getElementById('status').textContent = msg.door_state; 
-    }) 
-    .catch(error => { 
-      document.getElementById('status').textContent = 'Activate Error'; 
-    }); 
-    refreshFunction = setInterval(updateStatus, refreshInterval);
-  }; 
-  updateStatus(); 
-  refreshFunction = setInterval(updateStatus, refreshInterval); 
-  </script>
+</style>
+<script>
+var refreshFuction;
+var refreshInterval = 5000;
+function updateStatus() { 
+  fetch('/status') 
+  .then(response => response.json())
+  .then(msg => {
+    document.getElementById('status').textContent = msg.door_state;
+    if (msg.door_state == 'OPEN') { 
+      document.getElementById('closed-path').style.display = 'none';
+    } else { 
+      document.getElementById('closed-path').style.display = 'block';
+    }
+  })
+  .catch(error => { 
+    document.getElementById('status').textContent = 'Status Error';
+  });
+}
+function activateDoor() { 
+  clearInterval(refreshFuction);
+  document.getElementById('activate-btn').disabled = true;
+  fetch('/activate', { method: 'POST' }) 
+  .then(response => response.json()) 
+  .then(msg => { 
+    document.getElementById('status').textContent = msg.door_state;
+  }) 
+  .catch(error => {
+    document.getElementById('status').textContent = 'Activate Error';
+  })
+  .finally( () => {
+    refreshFuction = setInterval(updateStatus, refreshInterval);
+    document.getElementById('activate-btn').disabled = false;
+  });
+}
+updateStatus(); 
+refreshFuction = setInterval(updateStatus, refreshInterval); 
+</script>
 </head>
 <body>
   <h1>Garage Door Status</h1>
   <div id="status-container">
     <svg id="garage-door" style="width: 200px;" role="img" viewBox="0 0 24 24">
       <g>
-        <path id="closed-path" style="display:block;" class="primary-path" d="M22 9V20H20V11H4V20H2V9L12 5L22 9M19 12H5V14H19V12M19 18H5V20H19V18M19 15H5V17H19V15Z"></path>
+        <path id="closed-path" style="display: block;" class="primary-path" d="M22 9V20H20V11H4V20H2V9L12 5L22 9M19 12H5V14H19V12M19 18H5V20H19V18M19 15H5V17H19V15Z"></path>
         <path id="open-path" style="display:block;" class="primary-path" d="M22 9V20H20V11H4V20H2V9L12 5L22 9M19 12H5V14H19V12Z"></path>
       </g>
     </svg>
