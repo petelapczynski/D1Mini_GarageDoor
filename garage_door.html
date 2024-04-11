@@ -36,18 +36,20 @@ function updateStatus() {
 function activateDoor() { 
   clearInterval(refreshFuction);
   document.getElementById('activate-btn').disabled = true;
-  fetch('/activate', { method: 'POST' }) 
-  .then(response => response.json()) 
-  .then(msg => { 
-    document.getElementById('status').textContent = msg.door_state;
-  }) 
-  .catch(error => {
-    document.getElementById('status').textContent = 'Activate Error';
-  })
-  .finally( () => {
-    refreshFuction = setInterval(updateStatus, refreshInterval);
-    document.getElementById('activate-btn').disabled = false;
-  });
+  if (confirm('This action will activate the garage door.') == true) {
+    fetch('/activate', { method: 'POST' }) 
+    .then(response => response.json()) 
+    .then(msg => { 
+      document.getElementById('status').textContent = msg.door_state;
+    }) 
+    .catch(error => {
+      document.getElementById('status').textContent = 'Activate Error';
+    })
+    .finally( () => {
+      refreshFuction = setInterval(updateStatus, refreshInterval);
+    });
+  }
+  document.getElementById('activate-btn').disabled = false;
 }
 updateStatus(); 
 refreshFuction = setInterval(updateStatus, refreshInterval); 
